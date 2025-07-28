@@ -9,9 +9,17 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "��#\u0000 \u0000V\u0000e\u0000n\u0000n\u0000A\u0000c\u0000t\u0000o\u0000r\u0000G\u0000r\u0000a\u0000m\u0000\r\u0000 \u0000",
   "dependencies": {
     "axios": "^1.11.0",
     "express": "^5.1.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arcite9940/VennActorGram.git"
+  },
+  "bugs": {
+    "url": "https://github.com/arcite9940/VennActorGram/issues"
+  },
+  "homepage": "https://github.com/arcite9940/VennActorGram#readme"
 }
