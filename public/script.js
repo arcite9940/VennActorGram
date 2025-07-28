@@ -29,14 +29,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const response = await fetch(`/search-media?query=${encodeURIComponent(query)}`);
         const results = await response.json();
 
-        suggestions.innerHTML = results.map(item => `<li data-id="${item.id}" data-type="${item.type}">${item.title} (${item.release_year})</li>`).join('');
+        suggestions.innerHTML = results.map(item => `
+          <li data-id="${item.id}" data-type="${item.type}">
+            ${item.title} (${item.release_year})
+          </li>
+        `).join('');
 
         // Handle suggestion click
         suggestions.querySelectorAll('li').forEach(li => {
           li.addEventListener('click', () => {
-            // Truncate long titles for display (e.g., max 150 chars)
-            //const displayText = li.textContent.length > 150 ? li.textContent.substring(0, 147) + '...' : li.textContent;
-            input.value = li.textContent;
+            // Truncate long titles for display
+            const displayText = li.textContent.length > 50 ? li.textContent.substring(0, 47) + '...' : li.textContent;
+            input.value = displayText;
             idInput.value = li.dataset.id;
             typeInput.value = li.dataset.type;
             suggestions.innerHTML = '';
@@ -68,6 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const id2 = document.getElementById('media2-id').value;
     const type2 = document.getElementById('media2-type').value;
     const resultsDiv = document.getElementById('results');
+    const title1 = document.getElementById('media1').value;
+    const title2 = document.getElementById('media2').value;
 
     if (!id1 || !type1 || !id2 || !type2) {
       resultsDiv.innerHTML = '<p class="error">Please select both media titles from the suggestions.</p>';
@@ -90,13 +96,34 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      if (data.actors.length === 0) {
-        resultsDiv.innerHTML = `<p>${data.message}</p>`;
-        return;
+      // Build HTML for results
+      let html = '';
+
+      // Actors for first media
+      if (data.actors1 && data.actors1.length > 0) {
+        const actorList1 = data.actors1.map(actor => `<li>${actor}</li>`).join('');
+        html += `<h2>Actors in ${title1}:</h2><ul>${actorList1}</ul>`;
+      } else {
+        html += `<p>No actors found for ${title1}.</p>`;
       }
 
-      const actorList = data.actors.map(actor => `<li>${actor}</li>`).join('');
-      resultsDiv.innerHTML = `<h2>Shared Actors:</h2><ul>${actorList}</ul>`;
+      // Actors for second media
+      if (data.actors2 && data.actors2.length > 0) {
+        const actorList2 = data.actors2.map(actor => `<li>${actor}</li>`).join('');
+        html += `<h2>Actors in ${title2}:</h2><ul>${actorList2}</ul>`;
+      } else {
+        html += `<p>No actors found for ${title2}.</p>`;
+      }
+
+      // Shared actors
+      if (data.sharedActors && data.sharedActors.length > 0) {
+        const sharedList = data.sharedActors.map(actor => `<li>${actor}</li>`).join('');
+        html += `<h2>Shared Actors:</h2><ul>${sharedList}</ul>`;
+      } else {
+        html += `<p>${data.message}</p>`;
+      }
+
+      resultsDiv.innerHTML = html;
     } catch (error) {
       resultsDiv.innerHTML = '<p class="error">An error occurred. Please try again.</p>';
     }

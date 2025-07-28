@@ -55,7 +55,7 @@ app.get('/search-media', async (req, res) => {
   }
 });
 
-// Endpoint to find shared actors
+// Endpoint to find shared actors and return all actors
 app.post('/find-shared-actors', async (req, res) => {
   const { id1, type1, id2, type2 } = req.body;
 
@@ -71,19 +71,16 @@ app.post('/find-shared-actors', async (req, res) => {
     ]);
 
     const actors1 = credits1.data.cast.map(actor => actor.name);
-    console.log(JSON.stringify(actors1));
-
     const actors2 = credits2.data.cast.map(actor => actor.name);
-    console.log(JSON.stringify(actors2));
-
 
     const sharedActors = actors1.filter(actor => actors2.includes(actor));
 
-    if (sharedActors.length === 0) {
-      return res.json({ message: 'No shared actors found.', actors: [] });
-    }
-
-    res.json({ actors: sharedActors });
+    res.json({
+      actors1, // Full cast of first media
+      actors2, // Full cast of second media
+      sharedActors,
+      message: sharedActors.length === 0 ? 'No shared actors found.' : null
+    });
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while fetching data.' });
   }
