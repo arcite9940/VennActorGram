@@ -38,9 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handle suggestion click
         suggestions.querySelectorAll('li').forEach(li => {
           li.addEventListener('click', () => {
-            // Truncate long titles for display (e.g., max 50 chars)
-            const displayText = li.textContent.length > 50 ? li.textContent.substring(0, 47) + '...' : li.textContent;
-            input.value = displayText;
+            // Truncate long titles for display (e.g., max 150 chars)
+            //const displayText = li.textContent.length > 150 ? li.textContent.substring(0, 147) + '...' : li.textContent;
+            input.value = li.textContent;
             idInput.value = li.dataset.id;
             typeInput.value = li.dataset.type;
             suggestions.innerHTML = '';

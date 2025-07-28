@@ -71,7 +71,11 @@ app.post('/find-shared-actors', async (req, res) => {
     ]);
 
     const actors1 = credits1.data.cast.map(actor => actor.name);
+    console.log(JSON.stringify(actors1));
+
     const actors2 = credits2.data.cast.map(actor => actor.name);
+    console.log(JSON.stringify(actors2));
+
 
     const sharedActors = actors1.filter(actor => actors2.includes(actor));
 
