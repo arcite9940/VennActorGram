@@ -8,18 +8,23 @@
 </head>
 <body>
   <div class="container">
-     <button id="theme-toggle">🌓</button>
     <h1>VennActorGram</h1>
+    <button id="theme-toggle" name="theme-toggle">🌓</button>
     <form id="actor-form">
-      <label for="title1">First Movie/TV Show:</label>
-      <input type="text" id="title1" name="title1" required>
-      <label for="title2">Second Movie/TV Show:</label>
-      <input type="text" id="title2" name="title2" required>
-      <label for="type">Type:</label>
-      <select id="type" name="type">
-        <option value="movie">Movie</option>
-        <option value="tv">TV Show</option>
-      </select>
+      <label for="media1">First Media:</label>
+      <div class="search-container">
+        <input type="text" id="media1" name="media1" required autocomplete="off">
+        <ul id="media1-suggestions" class="suggestions"></ul>
+        <input type="hidden" id="media1-id" name="media1-id">
+        <input type="hidden" id="media1-type" name="media1-type">
+      </div>
+      <label for="media2">Second Media:</label>
+      <div class="search-container">
+        <input type="text" id="media2" name="media2" required autocomplete="off">
+        <ul id="media2-suggestions" class="suggestions"></ul>
+        <input type="hidden" id="media2-id" name="media2-id">
+        <input type="hidden" id="media2-type" name="media2-type">
+      </div>
       <button type="submit">Find Shared Actors</button>
     </form>
     <div id="results"></div>

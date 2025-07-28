@@ -3,7 +3,7 @@ const axios = require('axios');
 const app = express();
 const port = process.env.PORT || 3000;
 
-const TMDB_API_KEY = process.env.TMDB_API_KEY; // Environment variable
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
 
 // Serve static files (HTML, CSS, JS)
 app.use(express.static('public'));
@@ -14,32 +14,68 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
 
-// Endpoint to find shared actors
-app.post('/find-shared-actors', async (req, res) => {
-  const { title1, title2, type } = req.body;
+// Search media endpoint for autocomplete
+app.get('/search-media', async (req, res) => {
+  const { query } = req.query;
+
+  if (!query || query.trim().length < 2) {
+    return res.json([]);
+  }
 
   try {
     if (!TMDB_API_KEY) {
       return res.status(500).json({ error: 'API key not configured' });
     }
 
-    const search1 = await axios.get(`https://api.themoviedb.org/3/search/${type}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(title1)}`);
-    if (search1.data.results.length === 0) {
-      return res.status(404).json({ error: `No results found for ${title1}` });
-    }
-    const id1 = search1.data.results[0].id;
+    // Search both movies and TV shows
+    const [movieResponse, tvResponse] = await Promise.all([
+      axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`),
+      axios.get(`https://api.themoviedb.org/3/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`),
+    ]);
 
-    const search2 = await axios.get(`https://api.themoviedb.org/3/search/${type}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(title2)}`);
-    if (search2.data.results.length === 0) {
-      return res.status(404).json({ error: `No results found for ${title2}` });
-    }
-    const id2 = search2.data.results[0].id;
+    const movies = movieResponse.data.results.map(item => ({
+      id: item.id,
+      title: item.title,
+      release_year: item.release_date ? item.release_date.split('-')[0] : 'N/A',
+      type: 'movie',
+    }));
 
-    const credits1 = await axios.get(`https://api.themoviedb.org/3/${type}/${id1}/credits?api_key=${TMDB_API_KEY}`);
-    const credits2 = await axios.get(`https://api.themoviedb.org/3/${type}/${id2}/credits?api_key=${TMDB_API_KEY}`);
+    const tvShows = tvResponse.data.results.map(item => ({
+      id: item.id,
+      title: item.name,
+      release_year: item.first_air_date ? item.first_air_date.split('-')[0] : 'N/A',
+      type: 'tv',
+    }));
+
+    // Combine and limit results
+    const results = [...movies, ...tvShows].slice(0, 10);
+    res.json(results);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching search results' });
+  }
+});
+
+// Endpoint to find shared actors
+app.post('/find-shared-actors', async (req, res) => {
+  const { id1, type1, id2, type2 } = req.body;
+
+  try {
+    if (!TMDB_API_KEY) {
+      return res.status(500).json({ error: 'API key not configured' });
+    }
+
+    // Fetch credits for both media
+    const [credits1, credits2] = await Promise.all([
+      axios.get(`https://api.themoviedb.org/3/${type1}/${id1}/credits?api_key=${TMDB_API_KEY}`),
+      axios.get(`https://api.themoviedb.org/3/${type2}/${id2}/credits?api_key=${TMDB_API_KEY}`),
+    ]);
 
     const actors1 = credits1.data.cast.map(actor => actor.name);
+    console.log(JSON.stringify(actors1));
+
     const actors2 = credits2.data.cast.map(actor => actor.name);
+    console.log(JSON.stringify(actors2));
+
 
     const sharedActors = actors1.filter(actor => actors2.includes(actor));
 
