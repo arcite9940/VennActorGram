@@ -29,11 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const response = await fetch(`/search-media?query=${encodeURIComponent(query)}`);
         const results = await response.json();
 
-        suggestions.innerHTML = results.map(item => `
-          <li data-id="${item.id}" data-type="${item.type}">
-            ${item.title} (${item.release_year})
-          </li>
-        `).join('');
+        suggestions.innerHTML = results.map(item => `<li data-id="${item.id}" data-type="${item.type}">${item.title} (${item.release_year})</li>`).join('');
 
         // Handle suggestion click
         suggestions.querySelectorAll('li').forEach(li => {
