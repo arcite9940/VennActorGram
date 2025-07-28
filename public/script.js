@@ -29,11 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const response = await fetch(`/search-media?query=${encodeURIComponent(query)}`);
         const results = await response.json();
 
-        suggestions.innerHTML = results.map(item => `
-          <li data-id="${item.id}" data-type="${item.type}">
-            ${item.title} (${item.release_year})
-          </li>
-        `).join('');
+        suggestions.innerHTML = results.map(item => `<li data-id="${item.id}" data-type="${item.type}">${item.title} (${item.release_year})</li>`).join('');
 
         // Handle suggestion click
         suggestions.querySelectorAll('li').forEach(li => {
@@ -98,22 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Build HTML for results
       let html = '';
-
-      // Actors for first media
-      if (data.actors1 && data.actors1.length > 0) {
-        const actorList1 = data.actors1.map(actor => `<li>${actor}</li>`).join('');
-        html += `<h2>Actors in ${title1}:</h2><ul>${actorList1}</ul>`;
-      } else {
-        html += `<p>No actors found for ${title1}.</p>`;
-      }
-
-      // Actors for second media
-      if (data.actors2 && data.actors2.length > 0) {
-        const actorList2 = data.actors2.map(actor => `<li>${actor}</li>`).join('');
-        html += `<h2>Actors in ${title2}:</h2><ul>${actorList2}</ul>`;
-      } else {
-        html += `<p>No actors found for ${title2}.</p>`;
-      }
 
       // Shared actors
       if (data.sharedActors && data.sharedActors.length > 0) {
